@@ -25,6 +25,7 @@ MongoDB migrate uses a configuration file called config.cfg. It has the followin
 *  *MIGRATION_DIR*   - Where to find migrations. Default is ./db/migrate/
 *  *MONGO_USR*       - Username. Default is empty
 *  *MONGO_PWD*       - Password. Default is empty
+*  *PROJECT*         - Set a project name to allow executing mongo-migrate for different projects with different versions using the same database.
 
 Note: When you use MONGO_USR and not MONGO_PWD you'll be prompted for password.
 
