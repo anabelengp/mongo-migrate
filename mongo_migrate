@@ -105,22 +105,21 @@ run_migration() {
     local migration_name="$(echo $file |awk -F/ '{print $NF}')"
     local migration_time="$(echo $migration_name |cut -d_ -f1 |bc)"
 
-    update_current_migration `echo "$migration_time$inc"|bc`
+    update_current_migration `echo "$migration_time$inc"|bc` $PROJECT
 
     echo "Migration ${name} ${target} executed\n"
 }
 
 get_current_migration() {
-    echo "`mongo $MONGO_HOST/$MONGO_DATABASE $auth --quiet ./get_current.js`"
+    echo "`mongo $MONGO_HOST/$MONGO_DATABASE $auth --quiet --eval "var project='${1}';" ./get_current.js`"
 }
 
 update_current_migration() {
-    mongo $MONGO_HOST/$MONGO_DATABASE $auth --quiet --eval "current='${1}'" ./update_current.js
+    mongo $MONGO_HOST/$MONGO_DATABASE $auth --quiet --eval "var current='${1}'; var project='${2}'" ./update_current.js
 }
 
 all_up() {
-    local current_migration=`get_current_migration|bc`
-
+    local current_migration="`get_current_migration "$PROJECT" |bc`"
     local migrations="$(find $MIGRATION_DIR -name \*.js |sort -n)"
     for migration in $migrations
     do
@@ -133,8 +132,7 @@ all_up() {
 }
 
 all_down() {
-    local current_migration=`get_current_migration|bc`
-
+    local current_migration=`get_current_migration "$PROJECT" |bc`
     local migrations="$(find $MIGRATION_DIR -name \*.js |sort -nr)"
     for migration in $migrations
     do
